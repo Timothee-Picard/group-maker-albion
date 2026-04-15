@@ -10,6 +10,7 @@ import { EventService } from '../services/event.service.js';
 import { PermissionService } from '../services/permission.service.js';
 import { buildCompositionsUI } from '../handlers/compositions.handler.js';
 import { buildEventsUI } from '../handlers/events.handler.js';
+import { logger } from '../core/logger.js';
 
 export const data = new SlashCommandBuilder()
   .setName('groupmaker')
@@ -53,12 +54,16 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const guildId = interaction.guildId;
+  const subcommand = interaction.options.getSubcommand();
+  logger.info({ guildId, subcommand }, `Executing /groupmaker command`);
+
   if (!guildId) return;
 
   const member = interaction.member as GuildMember;
   if (!member) return;
 
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  logger.debug(`Interaction deferred for /groupmaker ${subcommand}`);
 
   const subcommandGroup = interaction.options.getSubcommandGroup();
   const subcommand = interaction.options.getSubcommand();

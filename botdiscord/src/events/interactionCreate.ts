@@ -21,10 +21,18 @@ export async function execute(interaction: Interaction) {
       await command.execute(interaction);
     } catch (error) {
       logger.error({ err: error }, `Error executing command ${interaction.commandName}`);
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-      } else {
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+      
+      const errorMessage = 'Une erreur est survenue lors de l\'exécution de cette commande.';
+      
+      // Handle the case where the interaction was already acknowledged (deferred or replied)
+      try {
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({ content: errorMessage, ephemeral: true });
+        } else {
+          await interaction.reply({ content: errorMessage, ephemeral: true });
+        }
+      } catch (innerError) {
+        logger.error({ err: innerError }, 'Failed to send error message to Discord');
       }
     }
   } else if (interaction.isButton()) {
