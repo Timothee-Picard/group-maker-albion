@@ -1,0 +1,8 @@
+{
+  "name": "siteweb",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Siteweb not implemented yet'"
+  }
+}

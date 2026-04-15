@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id            String           @id // Discord Guild ID
+  compositions  Composition[]
+  events        Event[]
+  authorizedRoles AuthorizedRole[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model AuthorizedRole {
+  roleId    String   @id // Discord Role ID
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Composition {
+  id          String   @id @default(uuid())
+  guildId     String
+  guild       Guild    @relation(fields: [guildId], references: [id])
+  name        String
+  roles       String[] // Stored as simple strings for now, e.g., ["1. Tank", "2. Heal"]
+  events      Event[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id            String        @id @default(uuid())
+  guildId       String
+  guild         Guild         @relation(fields: [guildId], references: [id])
+  compositionId String
+  composition   Composition   @relation(fields: [compositionId], references: [id])
+  name          String
+  description   String?
+  messageId     String?       // The ID of the Discord message announcing the event
+  threadId      String?       // The ID of the Discord thread attached
+  participants  Participant[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Participant {
+  id          String   @id @default(uuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
+  userId      String   // Discord User ID
+  roleIndex   Int      // The index corresponding to the role in the composition
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([eventId, roleIndex]) // Only one user per slot in a given event
+  @@unique([eventId, userId])    // One user can only take one slot per event
+}
