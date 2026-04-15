@@ -1,6 +1,9 @@
 # Use Node 20 alpine as builder
 FROM node:20-alpine AS builder
 
+# Install system dependencies for Prisma
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 # Copy root package.json and workspace configurations
@@ -22,6 +25,10 @@ RUN npm run build
 
 # Stage 2: Production runner
 FROM node:20-alpine AS runner
+
+# Install system dependencies for Prisma in runner stage
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 COPY --from=builder /app/package.json ./
