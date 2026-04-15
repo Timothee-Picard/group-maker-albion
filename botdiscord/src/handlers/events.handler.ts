@@ -185,7 +185,7 @@ export async function handleEventButtons(interaction: ButtonInteraction) {
          try {
             const tempThread = await interaction.client.channels.fetch(evt.threadId).catch(()=>null);
             if(tempThread && tempThread.isThread() && tempThread.parent) {
-                const parentMsg = await tempThread.parent.messages.fetch(evt.messageId).catch(()=>null);
+                const parentMsg = await (tempThread.parent as TextChannel).messages.fetch(evt.messageId).catch(()=>null);
                 if (parentMsg && parentMsg.deletable) {
                     await parentMsg.delete();
                 }
