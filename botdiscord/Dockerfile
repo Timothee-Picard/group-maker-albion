@@ -1,8 +1,8 @@
-# Use Node 20 alpine as builder
-FROM node:20-alpine AS builder
+# Use Node 20 slim as builder
+FROM node:20-slim AS builder
 
 # Install system dependencies for Prisma
-RUN apk add --no-cache openssl libc6-compat
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -24,10 +24,10 @@ RUN npx prisma generate
 RUN npm run build
 
 # Stage 2: Production runner
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 # Install system dependencies for Prisma in runner stage
-RUN apk add --no-cache openssl libc6-compat
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
