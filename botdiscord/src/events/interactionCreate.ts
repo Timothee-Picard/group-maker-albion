@@ -1,4 +1,4 @@
-import { Events, Interaction } from 'discord.js';
+import { Events, Interaction, MessageFlags } from 'discord.js';
 import { logger } from '../core/logger.js';
 import type { GroupMakerClient } from '../core/client.js';
 import { handleCompositionButtons, handleCompositionModals, handleCompositionSelects } from '../handlers/compositions.handler.js';
@@ -19,17 +19,24 @@ export async function execute(interaction: Interaction) {
 
     try {
       await command.execute(interaction);
-    } catch (error) {
+    } catch (error: any) {
       logger.error({ err: error }, `Error executing command ${interaction.commandName}`);
       
       const errorMessage = 'Une erreur est survenue lors de l\'exécution de cette commande.';
       
+      // If it's a "Ghost Instance" error (Unknown Interaction or Already Acknowledged), 
+      // we don't try to answer as it will fail again and clutter logs.
+      if (error.code === 10062 || error.code === 40060) {
+        logger.warn('Interaction already dead (ghost instance detected or manual acknowledgement). Skipping error response.');
+        return;
+      }
+      
       // Handle the case where the interaction was already acknowledged (deferred or replied)
       try {
         if (interaction.replied || interaction.deferred) {
-          await interaction.followUp({ content: errorMessage, ephemeral: true });
+          await interaction.followUp({ content: errorMessage, flags: MessageFlags.Ephemeral });
         } else {
-          await interaction.reply({ content: errorMessage, ephemeral: true });
+          await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
         }
       } catch (innerError) {
         logger.error({ err: innerError }, 'Failed to send error message to Discord');
