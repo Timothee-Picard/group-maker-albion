@@ -11,10 +11,10 @@ install: ## Install all dependencies via npm
 	npm install
 
 docker-up: ## Start the database background container
-	cd docker && docker compose --env-file ../.env up -d
+	docker compose up -d
 
 docker-down: ## Stop the database background container
-	cd docker && docker compose --env-file ../.env down
+	docker compose down
 
 db-generate: ## Generate the Prisma client
 	cd botdiscord && npx prisma generate

@@ -1,12 +1,11 @@
-
 services:
   botdiscord:
     build:
-      context: ..
+      context: .
       dockerfile: botdiscord/Dockerfile
     restart: unless-stopped
     env_file:
-      - ../.env
+      - .env
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
     depends_on:
@@ -17,7 +16,7 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     env_file:
-      - ../.env
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
