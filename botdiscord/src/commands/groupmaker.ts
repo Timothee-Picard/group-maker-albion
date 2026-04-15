@@ -66,7 +66,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   logger.debug(`Interaction deferred for /groupmaker ${subcommand}`);
 
   const subcommandGroup = interaction.options.getSubcommandGroup();
-  const subcommand = interaction.options.getSubcommand();
 
   // 1. Check permissions
   // Only users with ManageGuild OR Authorized Role can access administrative subcommands
